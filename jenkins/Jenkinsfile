@@ -1,5 +1,5 @@
 pipeline {
-    agent jenkins-agent-node1-ec2 
+    agent { label 'jenkins-agent-node1-ec2' } 
     stages {
         stage('Git Checkout') { 
             steps {
