@@ -7,12 +7,6 @@ set -x
 # Updating the system packages
 sudo apt update -y
 
-# Install Git (for cloning repositories)
-sudo apt install git -y
-
-# Install Maven (build tool for Java)
-sudo apt install maven -y
-
 # Installing Terraform
 sudo apt-get update && sudo apt-get install -y gnupg software-properties-common
 wget -O- https://apt.releases.hashicorp.com/gpg | \
@@ -55,3 +49,9 @@ sudo useradd -m -d /home/jenkins -s /bin/bash -g jenkins jenkins
 sudo mkdir -p /home/jenkins
 sudo chown -R ubuntu:ubuntu /home/jenkins
 sudo chmod 755 /home/jenkins
+
+# Install Git (for cloning repositories)
+sudo apt-get install git -y
+
+# Install Maven (build tool for Java)
+sudo apt-get install maven -y
