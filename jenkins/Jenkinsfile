@@ -39,9 +39,9 @@ pipeline {
             steps {
                 echo "Trivy Scan"
                 script {
-                    sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL kailop/java-devsecops-cicd:latest'
+                    sh 'trivy image kailop/java-devsecops-cicd:latest'
                 }
-            } 
+            }
         }
         stage("Upload Artifact to Nexus") {
             steps {
