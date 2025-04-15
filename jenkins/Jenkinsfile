@@ -1,0 +1,63 @@
+pipeline {
+    agent jenkins-agent-node1-ec2 
+    stages {
+        stage('Git Checkout') { 
+            steps {
+                echo "Git Checkout"
+                script {
+                    git branch: 'main',
+                        credentialsId: 'jenkins-git-credentials',
+                        url: 'https://github.com/kailop/java-devsecops-cicd.git'
+                }
+            }
+        }
+        stage('Mavan Build') {
+            steps {
+                echo "Maven Build"
+                script {
+                    sh 'mvn -B -DskipTests clean package'
+                }
+            } 
+        }
+        stage('JUnit Test') {
+            steps {
+                echo "JUnit Test"
+                script {
+                    sh 'mvn test'
+                }
+            } 
+        }
+        stage('Docker Build') {
+            steps {
+                echo "Docker Build"
+                script {
+                    sh 'docker build -t kailop/java-devsecops-cicd:latest .'
+                }
+            } 
+        }
+        stage("Trivy Container Scan") {
+            steps {
+                echo "Trivy Scan"
+                script {
+                    sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL kailop/java-devsecops-cicd:latest'
+                }
+            } 
+        }
+        stage("Upload Artifact to Nexus") {
+            steps {
+                echo "Nexus Upload"
+                script {
+                    sh 'curl -v -u kailop:password123 --upload-file target/java-devsecops-cicd-0.0.1-SNAPSHOT.jar http://nexus:8081/repository/maven-releases/com/kailop/java-devsecops-cicd/0.0.1-SNAPSHOT/java-devsecops-cicd-0.0.1-SNAPSHOT.jar'
+                }
+            } 
+        }
+        stage("Deploy to EKS Cluster with Helm") {
+            steps {
+                echo "Helm Deploy"
+                script {
+                    sh 'helm upgrade --install java-devsecops-cicd ./helm/java-devsecops-cicd --set image.tag=latest'
+                }
+            } 
+        }
+    }
+}
